@@ -40,6 +40,11 @@ Example:
         border-collapse: collapse;
       }
       
+      td:hover {
+        outline-style: solid;
+        outline-color: red;
+      }  
+      
       table {
         
         width: 100%;
@@ -103,7 +108,7 @@ Example:
           type: Object,
           value: null,
           notify: true,
-          reflectToAttriute: true
+          reflectToAttriute: false
           
         },
         
@@ -154,8 +159,6 @@ Example:
       // Element Behavior
       create: function () {
         
-        
-        
         if ( this.x > 0 && this.y > 0 ) {
           
           var table = document.createElement( "table" );
@@ -169,10 +172,40 @@ Example:
             for ( var j = 0; j < this.x; ++j ) {
               
               var td = document.createElement("td");
+              td.id = j.toString() + '-' + i.toString();
+              
+              if ( this.dark === true ) {
+                
+                //Ensure click is next to selected box
+                if ( !(j === (this.value.x + 1) && i === this.value.y ||
+                      j === (this.value.x - 1) && i === this.value.y ||
+                      j === this.value.x && i === (this.value.y - 1) ||
+                      j === this.value.x && i === (this.value.y + 1) ||
+                      j === this.value.x && i === this.value.y) ) {
+                        
+                        td.setAttribute( 'bgcolor', 'black' );
+                       
+                }       
+                
+              }
               
               td.onclick = function () {
                 
-                this.set( 'value', { x: j, y: i } );
+                //Ensure click is next to selected box
+                if ( j === (this.value.x + 1) && i === this.value.y ||
+                     j === (this.value.x - 1) && i === this.value.y ||
+                     j === this.value.x && i === (this.value.y - 1) ||
+                     j === this.value.x && i === (this.value.y + 1) ) {
+                       
+                       this.set( 'value', { x: j, y: i } );
+                       
+                       td.removeAttribute('bgcolor');
+                       
+                     } else {
+                       
+                       this.fire( 'invalid-click' );
+                       
+                     }
                 
               }.bind( this );
               
