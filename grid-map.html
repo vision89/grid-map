@@ -189,25 +189,61 @@ Example:
                 
               }
               
-              td.onclick = function () {
+              (function (i, j, td) {
                 
-                //Ensure click is next to selected box
-                if ( j === (this.value.x + 1) && i === this.value.y ||
-                     j === (this.value.x - 1) && i === this.value.y ||
-                     j === this.value.x && i === (this.value.y - 1) ||
-                     j === this.value.x && i === (this.value.y + 1) ) {
-                       
-                       this.set( 'value', { x: j, y: i } );
-                       
-                       td.removeAttribute('bgcolor');
-                       
-                     } else {
-                       
-                       this.fire( 'invalid-click' );
-                       
-                     }
+                td.onclick = function () {
+                  
+                  //Ensure click is next to selected box
+                  if ( j === (this.value.x + 1) && i === this.value.y ||
+                       j === (this.value.x - 1) && i === this.value.y ||
+                       j === this.value.x && i === (this.value.y - 1) ||
+                       j === this.value.x && i === (this.value.y + 1) ) {
+                         
+                         this.set( 'value', { x: j, y: i } );
+                         
+                         //Remove bg's
+                         td.removeAttribute('bgcolor');
+                         
+                         var right = document.getElementById( (j + 1).toString() + '-' + i.toString());
+                         var left = document.getElementById( (j -1).toString() + '-' + i.toString());
+                         var above = document.getElementById( j.toString() + '-' + (i - 1).toString());
+                         var below = document.getElementById( j.toString() + '-' + (i + 1).toString());
+                         
+                         if ( right ) {
+                           
+                           right.removeAttribute('bgcolor');
+                           
+                         }
+                         
+                         if ( left ) {
+                           
+                           left.removeAttribute('bgcolor');
+                           
+                         }
+                         
+                         if ( above ) {
+                           
+                           above.removeAttribute('bgcolor');
+                           
+                         }
+                         
+                         if ( below ) {
+                           
+                           below.removeAttribute('bgcolor');
+                           
+                         }
+                         
+                         //Get tds next to this one and remove those bgcolors too
+                         
+                       } else {
+                         
+                         this.fire( 'invalid-click' );
+                         
+                       }
+                  
+                }.bind( this );
                 
-              }.bind( this );
+              }.bind(this))(i,j,td);
               
               tr.appendChild(td);
               
