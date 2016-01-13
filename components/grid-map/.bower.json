@@ -1,0 +1,36 @@
+{
+  "name": "grid-map",
+  "authors": [
+    "Anonymous <anonymous@example.com>"
+  ],
+  "description": "An element providing a solution to no problem in particular.",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "seed"
+  ],
+  "main": "grid-map.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "^3.4.0"
+  },
+  "_release": "c63661e275",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "c63661e27543b9739a0033be4f92218047ee489d"
+  },
+  "_source": "git://github.com/vision89/grid-map.git",
+  "_target": "master",
+  "_originalSource": "vision89/grid-map",
+  "_direct": true
+}

@@ -1,0 +1,290 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+An element that overlays a grid onto an image.  Each section of the grid can
+be selected.  Optionally the grid will remain dark until clicked.
+
+Example:
+
+    <grid-map></grid-map>
+
+Example:
+
+    <grid-map>
+    </grid-map>
+
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="grid-map">
+  <template>
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+      }
+      
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      
+      td:hover {
+        outline-style: solid;
+        outline-color: red;
+      }  
+      
+      table {
+        
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        
+      }
+
+    </style>
+
+  </template>
+
+  <script>
+  
+    (function () {
+      
+      var oldTd = null;
+      
+      Polymer({
+        is: 'grid-map',
+  
+        properties: {
+          
+          /**
+           * Horizontal number of grids
+           */ 
+          x: {
+            
+            type: Number,
+            value: 0,
+            notify: false,
+            reflectToAttribute: false
+            
+          },
+          
+          /**
+           * Vertical number of grids
+           */ 
+          y: {
+            
+            type: Number,
+            value: 0,
+            notify: false,
+            reflectToAttribute: false
+            
+          },
+          
+          /**
+           * Image reference
+           */ 
+          image: {
+            
+            type: String,
+            value: '',
+            notify: false,
+            reflectToAttribute: false
+            
+          },
+          
+          /**
+           * The x,y coordinates of the selcted grid area
+           */ 
+          value: {
+            
+            type: Object,
+            value: null,
+            notify: true,
+            reflectToAttriute: false
+            
+          },
+          
+          /**
+           * Keep grid spaces dark until selected, or next to selected
+           */ 
+          dark: {
+            
+            type: Boolean,
+            value: false,
+            notify: false,
+            reflectToAttribute: false
+            
+          }
+          
+        },
+  
+        // Element Lifecycle
+  
+        ready: function() {
+          // `ready` is called after all elements have been configured, but
+          // propagates bottom-up. This element's children are ready, but parents
+          // are not.
+          //
+          // This is the point where you should make modifications to the DOM (when
+          // necessary), or kick off any processes the element wants to perform.
+        },
+  
+        attached: function() {
+          // `attached` fires once the element and its parents have been inserted
+          // into a document.
+          //
+          // This is a good place to perform any work related to your element's
+          // visual state or active behavior (measuring sizes, beginning animations,
+          // loading resources, etc).
+          
+          this.create();
+          
+        },
+  
+        detached: function() {
+          // The analog to `attached`, `detached` fires when the element has been
+          // removed from a document.
+          //
+          // Use this to clean up anything you did in `attached`.
+        },
+  
+        // Element Behavior
+        create: function () {
+          
+          if ( this.x > 0 && this.y > 0 ) {
+            
+            var table = document.createElement( "table" );
+            
+            table.setAttribute( 'background', this.image );
+            
+            for ( var i = 0; i < this.y; ++i ) {
+            
+              var tr = document.createElement("tr");
+              
+              for ( var j = 0; j < this.x; ++j ) {
+                
+                var td = document.createElement("td");
+                td.id = j.toString() + '-' + i.toString();
+                
+                if ( this.dark === true ) {
+                  
+                  //Ensure click is next to selected box
+                  if ( !(j === (this.value.x + 1) && i === this.value.y ||
+                        j === (this.value.x - 1) && i === this.value.y ||
+                        j === this.value.x && i === (this.value.y - 1) ||
+                        j === this.value.x && i === (this.value.y + 1) ||
+                        j === this.value.x && i === this.value.y) ) {
+                          
+                          td.setAttribute( 'bgcolor', 'black' );
+                         
+                  }
+                  
+                  if ( j === this.value.x && i === this.value.y ) {
+                    
+                    td.style.outlineStyle ='solid';
+                    td.style.outlineColor =  'green';
+                    
+                    oldTd = td;
+                    
+                  }
+                  
+                }
+                
+                (function (i, j, td) {
+                  
+                  td.onclick = function () {
+                    
+                    //Ensure click is next to selected box
+                    if ( j === (this.value.x + 1) && i === this.value.y ||
+                         j === (this.value.x - 1) && i === this.value.y ||
+                         j === this.value.x && i === (this.value.y - 1) ||
+                         j === this.value.x && i === (this.value.y + 1) ) {
+                           
+                       this.set( 'value', { x: j, y: i } );
+                       
+                       //Set the old td now that we've assigned a new value
+                       oldTd.style.outlineStyle = '';
+                       oldTd.style.outlineColor = '';
+                       
+                       oldTd = td;
+                       
+                       td.style.outlineStyle ='solid';
+                       td.style.outlineColor =  'green';
+                       
+                       //Remove bg's
+                       td.removeAttribute('bgcolor');
+                       
+                       var right = document.getElementById( (j + 1).toString() + '-' + i.toString());
+                       var left = document.getElementById( (j -1).toString() + '-' + i.toString());
+                       var above = document.getElementById( j.toString() + '-' + (i - 1).toString());
+                       var below = document.getElementById( j.toString() + '-' + (i + 1).toString());
+                       
+                       if ( right ) {
+                         
+                         right.removeAttribute('bgcolor');
+                         
+                       }
+                       
+                       if ( left ) {
+                         
+                         left.removeAttribute('bgcolor');
+                         
+                       }
+                       
+                       if ( above ) {
+                         
+                         above.removeAttribute('bgcolor');
+                         
+                       }
+                       
+                       if ( below ) {
+                         
+                         below.removeAttribute('bgcolor');
+                         
+                       }
+                       
+                       //Get tds next to this one and remove those bgcolors too
+                       
+                     } else {
+                       
+                       this.fire( 'invalid-click' );
+                       
+                     }
+                    
+                  }.bind( this );
+                  
+                }.bind(this))(i,j,td);
+                
+                tr.appendChild(td);
+                
+              }
+              
+              table.appendChild(tr);
+              
+            }
+            
+            Polymer.dom(this.root).appendChild(table);
+            
+          }
+          
+        }
+  
+      });
+      
+    })();
+  
+  </script>
+</dom-module>
